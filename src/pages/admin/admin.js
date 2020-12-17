@@ -4,61 +4,84 @@
  * @Author: Jimmy
  * @Date: 2020-12-14 10:24:20
  * @LastEditors: Jimmy
- * @LastEditTime: 2020-12-16 17:55:49
+ * @LastEditTime: 2020-12-17 15:27:24
  */
-import React from 'react';
-import {Switch,Route,Redirect} from "react-router-dom"
-import { Layout } from 'antd';
+import React, { lazy, Suspense } from "react";
+import { Switch, Route, Redirect } from "react-router-dom"
+import { Layout,Spin } from 'antd';
 import Header from "../../components/header"
 import Leftnav from "../../components/left-nav"
-// import Home from "@/pages/home/home";
-import User from "../user/user";
-import Category from '../category/category'
-import Product from '../product/product'
-import Role from '../role/role'
-import Bar from '../bar/bar'
-import Line from '../line/line'
-import Pie from '../pie/pie'
-import Order from '../order/order'
-import "./admin.less";
+import NotFound from "@/pages/not-found/not-found"
 import store from "../../utiils/storageUtils";
-// import componentList from "../../config/mainComponent";
+import componentList from "../../config/mainComponent";
+import "./admin.less";
+
 const { Footer, Sider, Content } = Layout;
 /*
 后台管理的路由组件
  */
 const Admin = () => {
+  const suspenseStype = { margin: '0 auto', display: 'block' };
   const user = store.getUser();
-  if(!user || !user._id){
-    return <Redirect to="/login"/>
+  if (!user || !user._id) {
+    return <Redirect to="/login" />
   }
- const {role:{menus}} = store.getUser();
+  const  roles  = store.getUser();
+  const {role:{menus}} = roles;
+  const {username} = roles;
+  const hasAuthority = (item) => {
+    // console.error("menus",menus,username)
+    if(menus.includes(item.path) || username==="admin" ){
+      return true
+    }
+    return false;
+  }
   return (
-    <Layout style={{minHeight: '100%'}}>
+    <Layout style={{ minHeight: '100%' }}>
       <Sider>
         <Leftnav></Leftnav>
       </Sider>
       <Layout>
         <Header></Header>
-        <Content style={{margin: 20, backgroundColor: '#fff'}}>
-          <Switch>
-          {/* <Route path='/home' component={Home}/> */}
-              {/* {componentList.map((item)=>{
-                
-              })} */}
-              {/* <Redirect from='/' exact to='/home'/>
-              <Route path='/home' component={Home}/>
-              <Route path='/category' component={Category}/>
-              <Route path='/product' component={Product}/>
-              <Route path='/user' component={User}/>
-              <Route path='/role' component={Role}/>
-              <Route path="/charts/bar" component={Bar}/>
-              <Route path="/charts/pie" component={Pie}/>
-              <Route path="/charts/line" component={Line}/>
-              <Route path="/order" component={Order}/> */}
-          </Switch>
+        <Content style={{ margin: 20, backgroundColor: '#fff' }}>
+          <Suspense
+          fallback={(
+            <Spin
+              spinning
+              style={ suspenseStype }
+            />
+          )}
+          >
+            <Switch>
+              <Redirect from='/' exact to='/home'/>
+              {
+              componentList.map((item,index) => {
+                if(hasAuthority(item)){
+                  const Asynccomponent = lazy(item.component)
+                  return (
+                    <Route
+                      key={index*99}
+                      path={item.path}
+                      render={
+                        (props) => {
+                          if (true) {
+                            return <Asynccomponent {...props} />
+                          }
+                     
+                        }
+                      }
+                    />
+                  )
+                }else{
+                  console.log("我进来了")
+                  return <NotFound/>
+                }
+              })}
+              <Route component={NotFound}/>
+            </Switch>
+          </Suspense>
         </Content>
-        <Footer style={{textAlign: 'center', color: '#cccccc'}}>推荐使用谷歌浏览器，可以获得更佳页面操作体验</Footer>
+        <Footer style={{ textAlign: 'center', color: '#cccccc' }}>推荐使用谷歌浏览器，可以获得更佳页面操作体验</Footer>
       </Layout>
     </Layout>
   )

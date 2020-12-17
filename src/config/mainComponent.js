@@ -4,7 +4,7 @@
  * @Author: Jimmy
  * @Date: 2020-12-14 13:37:01
  * @LastEditors: Jimmy
- * @LastEditTime: 2020-12-16 17:28:22
+ * @LastEditTime: 2020-12-17 15:30:00
  */
 const maincomponent = [
   {
@@ -18,6 +18,10 @@ const maincomponent = [
   {
     path:'/product',
     component:()=>import('@/pages/product/product'),
+  },
+  {
+    path:'/user',
+    component:()=>import("@/pages/user/user"),
   },
   {
     path:'/role',
