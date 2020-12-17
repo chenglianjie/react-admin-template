@@ -4,8 +4,9 @@
  * @Author: Jimmy
  * @Date: 2020-12-14 13:37:01
  * @LastEditors: Jimmy
- * @LastEditTime: 2020-12-16 17:28:22
+ * @LastEditTime: 2020-12-17 15:37:13
  */
+// 新增加的模块 要写进来
 const maincomponent = [
   {
     path:'/home',
@@ -18,6 +19,10 @@ const maincomponent = [
   {
     path:'/product',
     component:()=>import('@/pages/product/product'),
+  },
+  {
+    path:'/user',
+    component:()=>import("@/pages/user/user"),
   },
   {
     path:'/role',
